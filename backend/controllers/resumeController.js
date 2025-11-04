@@ -40,12 +40,7 @@ export const uploadResume = async (req, res) => {
     const prompt = `Role: ${role}\nResume text:\n${txt}\nReturn JSON: skills_present[], skills_missing[], suggested_improvements[]`;
     const geminiResp = await callGemini(prompt);
 
-    await User.findOneAndUpdate(
-      { email },
-      { $push: { geminiResponses: { role, responseText: geminiResp } } },
-      { new: true }
-    );
-
+    await User.findOneAndUpdate( {email}, {$push: { geminiResponses: {role, responseText: geminiResp} }},{ new: true });
     fs.unlinkSync(req.file.path); // delete PDF
     res.json({ ok: true, geminiResp });
   } catch (err) {
