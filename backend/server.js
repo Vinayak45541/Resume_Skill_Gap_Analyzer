@@ -1,22 +1,43 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import authRoutes from './routes/auth.js';
-import resumeRoutes from './routes/resume.js';
+import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
+// Load environment variables FIRST before anything else
 dotenv.config();
-const app = express();
 
-app.use(cors());
-app.use(express.json());
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/resume', resumeRoutes);
+// Validate API key on startup
+if (
+  !process.env.GEMINI_API_KEY ||
+  process.env.GEMINI_API_KEY === "your_gemini_api_key_here"
+) {
+  console.error("❌ ERROR: GEMINI_API_KEY is not set in backend/.env");
+  process.exit(1);
+}
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// Initialize server with async context for dynamic imports
+(async () => {
+  // Dynamically import routes AFTER dotenv is loaded
+  const { default: analyzeRoutes } = await import("./routes/analyzeRoutes.js");
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  // Ensure uploads directory exists
+  const uploadsDir = path.join(__dirname, "uploads");
+  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
+
+  const app = express();
+
+  app.use(cors());
+  app.use(express.json());
+
+  app.use("/api", analyzeRoutes);
+  app.get("/health", (_req, res) => res.json({ status: "ok" }));
+
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () =>
+    console.log(`✅ Server running on http://localhost:${PORT}`),
+  );
+})();
