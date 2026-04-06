@@ -1,4 +1,4 @@
-# 🚀 Skill Gap Analyzer
+# 🚀 Resume Skill Gap Analyzer
 
 Skill Gap Analyzer is a role-based resume analysis web application that evaluates how well a resume matches a selected technical role. The system extracts resume content, sends it to an AI model, and returns structured feedback including compatibility score, detected skills, missing skills, and improvement suggestions.
 
