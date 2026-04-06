@@ -102,7 +102,7 @@ VITE_API_URL=http://localhost:5000
 Clone the repository and install dependencies.
 
 ```
-git clone <repo-url>
+git clone https://github.com/Vinayak45541/Skill-Gap-Analyzer.git
 cd Skill-Gap-Analyzer
 
 # install backend dependencies
